@@ -43,8 +43,9 @@ readonly version_je=5.3.0
 readonly version_lf=master   # ~unmaintained since 2018
 readonly version_lp=main
 readonly version_lt=master   # ~unmaintained since 2019
+readonly version_kmi=master
 readonly version_mesh=master # ~unmaintained since 2021
-readonly version_mi=v1.7.7
+readonly version_mi=master
 readonly version_mng=master  # ~unmaintained
 readonly version_nomesh=$version_mesh
 readonly version_pa=main
@@ -73,6 +74,7 @@ setup_hd=0
 setup_hm=0
 setup_iso=0
 setup_je=0
+setup_kmi=0
 setup_lf=0
 setup_lp=0
 setup_lt=0
@@ -123,6 +125,7 @@ while : ; do
         setup_hd=$flag_arg              
         setup_iso=$flag_arg
         setup_je=$flag_arg
+        setup_kmi=$flag_arg
         setup_lp=$flag_arg
         setup_mi=$flag_arg
         setup_pa=$flag_arg
@@ -174,6 +177,8 @@ while : ; do
         setup_iso=$flag_arg;;
     je)
         setup_je=$flag_arg;;
+    kmi)
+	setup_kmi=$flag_arg;;
     lf)
         setup_lf=$flag_arg;;
     lp)
@@ -239,6 +244,7 @@ while : ; do
         echo "  lf                           setup lockfree-malloc ($version_lf)"
         echo "  lp                           setup libpas ($version_lp)"
         echo "  lt                           setup ltmalloc ($version_lt)"
+        echo "  kmi                          setup Kai's CS798 mimalloc ($version_kmi)"
         echo "  mesh                         setup mesh allocator ($version_mesh)"
         echo "  mi                           setup mimalloc ($version_mi)"
         echo "  mng                          setup mallocng ($version_mng)"
@@ -661,6 +667,38 @@ if test "$setup_sc" = "1"; then
     build/gyp/gyp --depth=. scalloc.gyp
   fi
   BUILDTYPE=Release make -j $procs
+  popd
+fi
+
+if test "$setup_kmi" = "1"; then
+  checkout kmi $version_kmi https://github.com/KaiSun314/mimalloc
+
+  echo ""
+  echo "- build mimalloc release"
+
+  mkdir -p out/release
+  cd out/release
+  cmake ../..
+  make -j $procs
+  cd ../..
+
+  echo ""
+  echo "- build mimalloc debug with full checking"
+
+  mkdir -p out/debug
+  cd out/debug
+  cmake ../.. -DMI_CHECK_FULL=ON
+  make -j $procs
+  cd ../..
+
+  echo ""
+  echo "- build mimalloc secure"
+
+  mkdir -p out/secure
+  cd out/secure
+  cmake ../.. -DMI_SECURE=ON
+  make -j $procs
+  cd ../..
   popd
 fi
 

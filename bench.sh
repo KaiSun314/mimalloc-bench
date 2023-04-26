@@ -6,7 +6,7 @@
 # Allocators and tests
 # --------------------------------------------------------------------
 
-readonly alloc_all="sys dh ff fg gd hd hm hml iso je lp lt mi mi-sec mng mesh nomesh pa rp sc scudo sg sm sn sn-sec tbb tc tcg dmi xmi xsmi xdmi"
+readonly alloc_all="sys dh ff fg gd hd hm hml iso je kmi lp lt mi mi-sec mng mesh nomesh pa rp sc scudo sg sm sn sn-sec tbb tc tcg dmi xmi xsmi xdmi"
 readonly alloc_secure="dh ff gd hm hml iso mi-sec mng pa scudo sg sn-sec sg"
 alloc_run=""           # allocators to run (expanded by command line options)
 alloc_installed="sys"  # later expanded to include all installed allocators
@@ -124,6 +124,7 @@ alloc_lib_add "tbb"    "$lib_tbb"
 alloc_lib_add "tc"     "$localdevdir/tc/.libs/libtcmalloc_minimal$extso"
 alloc_lib_add "tcg"    "$localdevdir/tcg/bazel-bin/tcmalloc/libtcmalloc$extso"
 
+alloc_lib_add "kmi"    "$localdevdir/kmi/out/release/libmimalloc$extso"
 alloc_lib_add "mi"     "$localdevdir/mi/out/release/libmimalloc$extso"
 alloc_lib_add "mi-sec" "$localdevdir/mi/out/secure/libmimalloc-secure$extso"
 alloc_lib_add "mi-dbg" "$localdevdir/mi/out/debug/libmimalloc-debug$extso"
@@ -344,7 +345,7 @@ while : ; do
             tests_run_add_remove "glibc-simple" "$flag_arg"
             tests_run_add_remove "glibc-thread" "$flag_arg";;
         spec=*)
-            test_run_add "spec"
+            tests_run_add "spec"
             run_spec_bench="$flag_arg";;
         --external=*)
             read_external_allocators_from_file "$flag_arg";;
@@ -386,6 +387,7 @@ while : ; do
             echo "  hml                          use hardened_malloc light"
             echo "  iso                          use isoalloc"
             echo "  je                           use jemalloc"
+            echo "  kmi                          use Kai's CS798 mimalloc"
             echo "  lp                           use libpas"
             echo "  lf                           use lockfree-malloc"
             echo "  mesh                         use mesh"
